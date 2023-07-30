@@ -1,22 +1,20 @@
-import Head from 'next/head';
+import Head from 'next/head'
 
 interface LayoutProps {
-  title: string;
-  children: React.ReactNode;
+  title?: string
+  children: React.ReactNode
 }
 
 const Layout = ({ children, title }: LayoutProps) => {
   return (
-    <div className="w-full h-full flex items-center justify-center">
+    <div className='w-full h-full bg-primary-light flex items-center justify-center py-8'>
       <Head>
-        <title>IceIdentity | {title}</title>
+        <title>{title ? `IceIdentity | ${title}` : 'IceIdentity'}</title>
       </Head>
 
-      <main className="shadow-xl border border-gray-200 rounded-md px-4 py-6">
-        {children}
-      </main>
+      <main className='shadow-xl bg-white border  border-gray-100 rounded-lg p-8'>{children}</main>
     </div>
-  );
-};
+  )
+}
 
-export default Layout;
+export default Layout
