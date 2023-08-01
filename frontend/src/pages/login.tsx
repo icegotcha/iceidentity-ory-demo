@@ -3,16 +3,16 @@ import Image from 'next/image'
 import { UserIcon, LockClosedIcon } from '@heroicons/react/24/outline'
 
 import Layout from 'components/Layout'
-import LoginIllust from 'assets/images/login-illust.svg'
 import Title from 'components/Title'
 import Input from 'components/Input'
 import Button from 'components/Button'
 
+import LoginIllust from 'assets/images/login-illust.svg'
 import GoogleIcon from 'assets/icons/google.svg'
 import FacebookIcon from 'assets/icons/facebook.svg'
 import GithubIcon from 'assets/icons/github.svg'
 
-const Home = () => {
+const LoginPage = () => {
   return (
     <Layout title='Login'>
       <div className='w-full mb-8'>
@@ -52,10 +52,12 @@ const Home = () => {
       </ul>
       <p className='text-base text-gray-400'>
         Not a member yet?
-        <Button type='link'>Sign up</Button>
+        <Button type='link' href='/signup'>
+          Sign up
+        </Button>
       </p>
     </Layout>
   )
 }
 
-export default Home
+export default LoginPage
