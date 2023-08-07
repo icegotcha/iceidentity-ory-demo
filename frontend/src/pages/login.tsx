@@ -1,4 +1,7 @@
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
 import Image from 'next/image'
+import { LoginFlow, UpdateLoginFlowBody } from '@ory/client'
 
 import { UserIcon, LockClosedIcon } from '@heroicons/react/24/outline'
 
@@ -11,8 +14,91 @@ import LoginIllust from 'assets/images/login-illust.svg'
 import GoogleIcon from 'assets/icons/google.svg'
 import FacebookIcon from 'assets/icons/facebook.svg'
 import GithubIcon from 'assets/icons/github.svg'
+import ory from 'pkg/sdk'
+import { handleFlowError, handleGetFlowError } from 'pkg/errors'
+import axios, { AxiosError } from 'axios'
 
 const LoginPage = () => {
+  const [flow, setFlow] = useState<LoginFlow>()
+
+  // Get ?flow=... from the URL
+  const router = useRouter()
+  const {
+    return_to: returnTo,
+    flow: flowId,
+    // Refresh means we want to refresh the session. This is needed, for example, when we want to update the password
+    // of a user.
+    refresh,
+    // AAL = Authorization Assurance Level. This implies that we want to upgrade the AAL, meaning that we want
+    // to perform two-factor authentication/verification.
+    aal,
+    login_challenge: loginChallenge,
+  } = router.query
+
+  useEffect(() => {
+    // If the router is not ready yet, or we already have a flow, do nothing.
+    if (!router.isReady || flow) {
+      return
+    }
+    // If ?flow=.. was in the URL, we fetch it
+    if (flowId) {
+      ory
+        .getLoginFlow({ id: String(flowId) })
+        .then(({ data }) => {
+          setFlow(data)
+        })
+        .catch(handleGetFlowError(router, 'login', setFlow))
+      return
+    }
+
+    // Otherwise we initialize it
+    ory
+      .createBrowserLoginFlow({
+        refresh: Boolean(refresh),
+        aal: aal ? String(aal) : undefined,
+        returnTo: returnTo ? String(returnTo) : undefined,
+      })
+      .then(({ data }) => {
+        setFlow(data)
+      })
+      .catch(handleFlowError(router, 'login', setFlow))
+  }, [flowId, router, router.isReady, aal, refresh, returnTo, flow])
+
+  const onSubmit = (values: UpdateLoginFlowBody) =>
+    router
+      // On submission, add the flow ID to the URL but do not navigate. This prevents the user loosing
+      // his data when she/he reloads the page.
+      .push(`/login?flow=${flow?.id}`, undefined, { shallow: true })
+      .then(() =>
+        ory
+          .updateLoginFlow({
+            flow: String(flow?.id),
+            updateLoginFlowBody: values,
+          })
+          .then(async () => {
+            const response = await axios.post(`/api/login?login_challenge=${loginChallenge}`, {}, { headers: {} })
+          })
+          // We logged in successfully! Let's bring the user home.
+          .then((data) => {
+            if (flow?.return_to) {
+              window.location.href = flow?.return_to
+              return
+            }
+            router.push('/')
+          })
+          .catch(handleFlowError(router, 'login', setFlow))
+          .catch((err: AxiosError) => {
+            // If the previous handler did not catch the error it's most likely a form validation error
+            if (err.response?.status === 400) {
+              // Yup, it is!
+              setFlow(err.response?.data)
+              return
+            }
+
+            return Promise.reject(err)
+          }),
+      )
+
   return (
     <Layout title='Login'>
       <div className='w-full mb-8'>
