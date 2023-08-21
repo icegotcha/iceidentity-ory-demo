@@ -4,10 +4,10 @@ serve:
 
 urls:
   self:
-    issuer: http://127.0.0.1:4444
-  consent: http://127.0.0.1:3000/consent
-  login: http://127.0.0.1:3000/login
-  logout: http://127.0.0.1:3000/logout
+    issuer: https://identity-test.example.com/oidc
+  consent: https://identity-test.example.com/api/oauth/consent
+  login: https://identity-test.example.com/api/oauth/login
+  logout: https://identity-test.example.com/logout
 
 secrets:
   system:

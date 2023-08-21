@@ -1,9 +1,20 @@
 version: "3.7"
 
 services:
+  reverse-proxy:
+    image: nginx:alpine
+    ports:
+      - 80:80
+      - 443:443
+    restart: unless-stopped
+    volumes:
+      - ../reverse-server/nginx/conf/:/etc/nginx/conf.d/:ro
+      - ../reverse-server/cert:/var/www/cert/:ro
+    networks:
+      - intranet
   database:
     image: postgres:13
-    restart: always
+    restart: unless-stopped
     environment:
       POSTGRES_PASSWORD: secret
     ports:
@@ -99,6 +110,7 @@ services:
     networks:
       - intranet
   frontend:
+    restart: unless-stopped
     build:
       context: ../frontend
       dockerfile: Dockerfile
@@ -110,9 +122,11 @@ services:
     command: npm run dev
     environment:
       - NODE_ENV=development
+      - ORY_SDK_URL=https://identity-test.example.com/auth
     networks:
       - intranet
   backend:
+    restart: unless-stopped
     build:
       context: ../backend
       dockerfile: Dockerfile
@@ -124,6 +138,10 @@ services:
     command: npm run dev
     environment:
       - NODE_ENV=development
+      - PORT=3001
+      - HYDRA_PUBLIC_URL=https://reverse-proxy/oidc
+      - KRATOS_PUBLIC_URL=https://reverse-proxy/auth
+      - KRATOS_BROWSER_URL=https://reverse-proxy
     networks:
       - intranet
 

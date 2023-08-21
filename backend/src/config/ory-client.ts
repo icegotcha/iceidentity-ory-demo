@@ -15,6 +15,10 @@ if (process.env.MOCK_TLS_TERMINATION) {
   hydraBaseOptions.headers = { "X-Forwarded-Proto": "https" };
 }
 
+console.log("apiBaseKratosInternalUrl", apiBaseKratosInternalUrl);
+console.log("apiBaseHydraUrlInternal", apiBaseHydraUrlInternal);
+console.log("browserBaseUrl", browserBaseUrl);
+
 // Sets up the SDK
 export const sdk = {
   basePath: apiBaseKratosInternalUrl,

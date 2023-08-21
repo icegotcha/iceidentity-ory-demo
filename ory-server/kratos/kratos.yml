@@ -4,16 +4,16 @@ dsn: postgres://admin:secret@database:5432/identity?sslmode=disable&max_conns=20
 
 serve:
   public:
-    base_url: http://127.0.0.1:4433/
+    base_url: https://identity-test.example.com/auth/
     cors:
       enabled: true
   admin:
-    base_url: http://kratos:4434/
+    base_url: https://identity-test.example.com/kratos/
 
 selfservice:
-  default_browser_return_url: http://127.0.0.1:3000/
+  default_browser_return_url: https://identity-test.example.com/
   allowed_return_urls:
-    - http://127.0.0.1:3000
+    - https://identity-test.example.com
 
   methods:
     password:
@@ -31,36 +31,36 @@ selfservice:
 
   flows:
     error:
-      ui_url: http://127.0.0.1:3000/error
+      ui_url: https://identity-test.example.com/error
 
     settings:
-      ui_url: http://127.0.0.1:3000/settings
+      ui_url: https://identity-test.example.com/settings
       privileged_session_max_age: 15m
       required_aal: highest_available
 
     recovery:
       enabled: true
-      ui_url: http://127.0.0.1:3000/recovery
+      ui_url: https://identity-test.example.com/recovery
       use: code
 
     verification:
       enabled: true
-      ui_url: http://127.0.0.1:3000/verification
+      ui_url: https://identity-test.example.com/verification
       use: code
       after:
-        default_browser_return_url: http://127.0.0.1:3000/
+        default_browser_return_url: https://identity-test.example.com/
 
     logout:
       after:
-        default_browser_return_url: http://127.0.0.1:3000/login
+        default_browser_return_url: https://identity-test.example.com/login
 
     login:
-      ui_url: http://127.0.0.1:3000/login
+      ui_url: https://identity-test.example.com/login
       lifespan: 10m
 
     registration:
       lifespan: 10m
-      ui_url: http://127.0.0.1:3000/registration
+      ui_url: https://identity-test.example.com/registration
       after:
         password:
           hooks:
