@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import Image from 'next/image'
-import { LoginFlow } from '@ory/client'
+import { LoginFlow, UpdateLoginFlowBody } from '@ory/client'
 
 import { UserIcon, LockClosedIcon } from '@heroicons/react/24/outline'
 
@@ -14,39 +14,37 @@ import LoginIllust from 'assets/images/login-illust.svg'
 import GoogleIcon from 'assets/icons/google.svg'
 import FacebookIcon from 'assets/icons/facebook.svg'
 import GithubIcon from 'assets/icons/github.svg'
-import ory from 'pkg/sdk'
+
+import ory from 'utils/sdk'
+import handleGetFlowError from 'utils/sdk/errors'
+import { useForm } from 'react-hook-form'
 
 const LoginPage = () => {
-  const [flow, setFlow] = useState<LoginFlow>()
+  const { register, handleSubmit, getValues } = useForm<UpdateLoginFlowBody>()
+  console.log('🚀 ~ file: login.tsx:28 ~ LoginPage ~ getValues:', getValues())
 
-  // Get ?flow=... from the URL
+  const [flow, setFlow] = useState<LoginFlow>()
+  console.log('🚀 ~ file: login.tsx:26 ~ LoginPage ~ flow:', flow)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+
   const router = useRouter()
-  const {
-    return_to: returnTo,
-    flow: flowId,
-    // Refresh means we want to refresh the session. This is needed, for example, when we want to update the password
-    // of a user.
-    refresh,
-    // AAL = Authorization Assurance Level. This implies that we want to upgrade the AAL, meaning that we want
-    // to perform two-factor authentication/verification.
-    aal,
-  } = router.query
+  const { return_to: returnTo, flow: flowId, refresh, aal } = router.query
 
   useEffect(() => {
-    // If the router is not ready yet, or we already have a flow, do nothing.
     if (!router.isReady || flow) {
       return
     }
-    // If ?flow=.. was in the URL, we fetch it
+
     if (flowId) {
-      ory.getLoginFlow({ id: String(flowId) }).then(({ data }) => {
-        setFlow(data)
-      })
-      // .catch(handleGetFlowError(router, 'login', setFlow))
+      ory
+        .getLoginFlow({ id: String(flowId) })
+        .then(({ data }) => {
+          setFlow(data)
+        })
+        .catch(handleGetFlowError(router, 'login', setFlow))
       return
     }
 
-    // Otherwise we initialize it
     ory
       .createBrowserLoginFlow({
         refresh: Boolean(refresh),
@@ -56,8 +54,32 @@ const LoginPage = () => {
       .then(({ data }) => {
         setFlow(data)
       })
-    // .catch(handleFlowError(router, 'login', setFlow))
-  }, [flowId, router, router.isReady, aal, refresh, returnTo, flow])
+      .catch(handleGetFlowError(router, 'login', setFlow))
+  }, [router, aal, refresh, returnTo, flowId, flow])
+
+  const onSubmit = async (values: UpdateLoginFlowBody) => {
+    if (isLoading) {
+      return
+    }
+    setIsLoading(true)
+    router.push(`/login?flow=${flow?.id}`, undefined, { shallow: true })
+    try {
+      await ory.updateLoginFlow({
+        flow: String(flow?.id),
+        updateLoginFlowBody: values,
+      })
+
+      if (flow?.return_to) {
+        window.location.href = flow?.return_to
+        return
+      }
+      router.push('/')
+    } catch (err) {
+      handleGetFlowError(router, 'login', setFlow)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
     <Layout title='Login'>
@@ -65,12 +87,17 @@ const LoginPage = () => {
         <Image src={LoginIllust} width={300} alt='Login Illustration' className='m-auto' />
       </div>
       <Title>Login</Title>
-      <form className='mt-8'>
+      <form className='mt-8' onSubmit={handleSubmit(onSubmit)}>
         <div className='mb-4'>
-          <Input name='email' label='Email' icon={<UserIcon />} />
+          <Input label='Email' icon={<UserIcon />} {...register('identifier', { required: true })} />
         </div>
         <div className='mb-4'>
-          <Input name='password' label='Password' type='password' icon={<LockClosedIcon />} />
+          <Input
+            label='Password'
+            type='password'
+            icon={<LockClosedIcon />}
+            {...register('password', { required: true })}
+          />
         </div>
         <div className='mb-8'>
           <Button block type='primary'>
