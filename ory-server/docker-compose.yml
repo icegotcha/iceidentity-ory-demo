@@ -1,17 +1,6 @@
 version: "3.7"
 
 services:
-  reverse-proxy:
-    image: nginx:alpine
-    ports:
-      - 80:80
-      - 443:443
-    restart: unless-stopped
-    volumes:
-      - ../reverse-server/nginx/conf/:/etc/nginx/conf.d/:ro
-      - ../reverse-server/cert:/var/www/cert/:ro
-    networks:
-      - intranet
   database:
     image: postgres:13
     restart: unless-stopped
@@ -109,41 +98,41 @@ services:
       - hydra-migrate
     networks:
       - intranet
-  frontend:
-    restart: unless-stopped
-    build:
-      context: ../frontend
-      dockerfile: Dockerfile
-      target: runner
-    volumes:
-      - ../frontend:/app
-    ports:
-      - "3000:3000"
-    command: npm run dev
-    environment:
-      - NODE_ENV=development
-      - ORY_SDK_URL=https://identity-test.example.com/auth
-    networks:
-      - intranet
-  backend:
-    restart: unless-stopped
-    build:
-      context: ../backend
-      dockerfile: Dockerfile
-      target: runner
-    volumes:
-      - ../backend:/app
-    ports:
-      - "3001:3001"
-    command: npm run dev
-    environment:
-      - NODE_ENV=development
-      - PORT=3001
-      - HYDRA_PUBLIC_URL=https://reverse-proxy/oidc
-      - KRATOS_PUBLIC_URL=https://reverse-proxy/auth
-      - KRATOS_BROWSER_URL=https://reverse-proxy
-    networks:
-      - intranet
+  # frontend:
+  #   restart: unless-stopped
+  #   build:
+  #     context: ../frontend
+  #     dockerfile: Dockerfile
+  #     target: runner
+  #   volumes:
+  #     - ../frontend:/app
+  #   ports:
+  #     - "3000:3000"
+  #   command: npm run dev
+  #   environment:
+  #     - NODE_ENV=development
+  #     - ORY_SDK_URL=http://kratos:4433
+  #   networks:
+  #     - intranet
+  # backend:
+  #   restart: unless-stopped
+  #   build:
+  #     context: ../backend
+  #     dockerfile: Dockerfile
+  #     target: runner
+  #   volumes:
+  #     - ../backend:/app
+  #   ports:
+  #     - "3001:3001"
+  #   command: npm run dev
+  #   environment:
+  #     - NODE_ENV=development
+  #     - PORT=3001
+  #     - HYDRA_PUBLIC_URL=http://hydra:4444
+  #     - KRATOS_PUBLIC_URL=http://kratos:4433
+  #     - KRATOS_BROWSER_URL=http://frontend:3000
+  #   networks:
+  #     - intranet
 
 networks:
   intranet:
