@@ -29,27 +29,31 @@ const redirectToLogin = (req: Request, res: Response, next: NextFunction) => {
       next(error);
       return;
     }
-    const configBaseUrl =
-      appConfig.baseUrl && appConfig.baseUrl != "/" ? appConfig.baseUrl : "";
 
+    const baseUrl = `${req.protocol}://${req.headers.host}`;
+
+    console.log(
+      "🚀 ~ file: login.ts:35 ~ req.session.save ~ baseUrl:",
+      baseUrl
+    );
     logger.debug("Return to: ", {
       url: req.url,
-      base: configBaseUrl,
+      base: baseUrl,
       prot: `${req.protocol}://${req.headers.host}`,
       "kratos.browser": oryDefaultConfig.kratosBrowserUrl,
     });
-    const baseUrl = configBaseUrl || `${req.protocol}://${req.headers.host}`;
+
     const returnTo = new URL(req.url, baseUrl);
     returnTo.searchParams.set("login_state", state);
     logger.debug(`returnTo: "${returnTo.toString()}"`, returnTo);
 
     logger.debug("new URL: ", [
-      oryDefaultConfig.kratosBrowserUrl + "/self-service/login/browser",
+      oryDefaultConfig.kratosApiBaseUrl + "/self-service/login/browser",
       baseUrl,
     ]);
 
     const redirectTo = new URL(
-      oryDefaultConfig.kratosBrowserUrl + "/self-service/login/browser",
+      oryDefaultConfig.kratosApiBaseUrl + "/self-service/login/browser",
       baseUrl
     );
     redirectTo.searchParams.set("refresh", "true");
@@ -68,7 +72,6 @@ const loginHandler = async (
 ) => {
   try {
     const loginChallenge = req.query.login_challenge?.toString(); // come from hydra
-    console.log("🚀 ~ file: login.ts:71 ~ loginChallenge:", loginChallenge);
     if (!isQuerySet(loginChallenge)) {
       const error = new ResponseError("login_challenge is not set", 400);
       next(error);
@@ -77,7 +80,6 @@ const loginHandler = async (
     const { data: loginRequest } = await sdk.oauth2.getOAuth2LoginRequest({
       loginChallenge,
     });
-    console.log("🚀 ~ file: login.ts:80 ~ loginRequest:", loginRequest);
     if (loginRequest.skip) {
       logger.debug("Accepting ORY Hydra Login Request because skip is true");
       return sdk.oauth2
@@ -91,7 +93,6 @@ const loginHandler = async (
     }
 
     const hydraLoginState = req.query.login_state;
-    console.log("🚀 ~ file: login.ts:94 ~ hydraLoginState:", hydraLoginState);
     if (!isQuerySet(hydraLoginState)) {
       logger.debug(
         "Redirecting to login page because login_state was not found in the HTTP URL query parameters."

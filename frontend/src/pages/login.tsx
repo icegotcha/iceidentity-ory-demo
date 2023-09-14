@@ -20,11 +20,9 @@ import handleGetFlowError from 'utils/sdk/errors'
 import { useForm } from 'react-hook-form'
 
 const LoginPage = () => {
-  const { register, handleSubmit, getValues } = useForm<UpdateLoginFlowBody>()
-  console.log('🚀 ~ file: login.tsx:28 ~ LoginPage ~ getValues:', getValues())
+  const { register, handleSubmit } = useForm<UpdateLoginFlowBody>()
 
   const [flow, setFlow] = useState<LoginFlow>()
-  console.log('🚀 ~ file: login.tsx:26 ~ LoginPage ~ flow:', flow)
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const router = useRouter()
@@ -55,6 +53,7 @@ const LoginPage = () => {
         setFlow(data)
       })
       .catch(handleGetFlowError(router, 'login', setFlow))
+    return () => {}
   }, [router, aal, refresh, returnTo, flowId, flow])
 
   const onSubmit = async (values: UpdateLoginFlowBody) => {

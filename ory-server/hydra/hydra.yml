@@ -4,10 +4,10 @@ serve:
 
 urls:
   self:
-    issuer: http://127.0.0.1:4444/
-  consent: http://127.0.0.1:3000/consent
-  login: http://127.0.0.1:3000/login
-  logout: http://127.0.0.1:3000/logout
+    issuer: http://172.29.170.149:4444/
+  consent: http://172.29.170.149:3000/consent
+  login: http://172.29.170.149:3001/oauth/login
+  logout: http://172.29.170.149:3000/logout
 
 secrets:
   system:
