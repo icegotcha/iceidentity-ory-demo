@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import Image from 'next/image'
-import { LoginFlow, UpdateLoginFlowBody } from '@ory/client'
+import { Controller, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { LoginFlow } from '@ory/client'
 
 import { UserIcon, LockClosedIcon } from '@heroicons/react/24/outline'
 
@@ -17,13 +19,16 @@ import GithubIcon from 'assets/icons/github.svg'
 
 import ory from 'utils/sdk'
 import handleGetFlowError from 'utils/sdk/errors'
-import { useForm } from 'react-hook-form'
+import { SignInSchema, SignInSchemaType } from 'types/signin'
 
-const LoginPage = () => {
-  const { register, handleSubmit } = useForm<UpdateLoginFlowBody>()
+const SignInPage = () => {
+  const {
+    handleSubmit,
+    control,
+    formState: { errors, isSubmitting },
+  } = useForm<SignInSchemaType>({ resolver: zodResolver(SignInSchema), mode: 'onChange' })
 
   const [flow, setFlow] = useState<LoginFlow>()
-  const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const router = useRouter()
   const { return_to: returnTo, flow: flowId, refresh, aal } = router.query
@@ -56,16 +61,26 @@ const LoginPage = () => {
     return () => {}
   }, [router, aal, refresh, returnTo, flowId, flow])
 
-  const onSubmit = async (values: UpdateLoginFlowBody) => {
-    if (isLoading) {
-      return
-    }
-    setIsLoading(true)
-    router.push(`/login?flow=${flow?.id}`, undefined, { shallow: true })
+  const onSubmit = async (values: SignInSchemaType) => {
+    router.replace(
+      {
+        pathname: router.pathname,
+        query: {
+          ...router.query,
+          flow: flow?.id,
+        },
+      },
+      undefined,
+      { shallow: true },
+    )
     try {
       await ory.updateLoginFlow({
         flow: String(flow?.id),
-        updateLoginFlowBody: values,
+        updateLoginFlowBody: {
+          method: 'password',
+          identifier: values.email,
+          password: values.password,
+        },
       })
 
       if (flow?.return_to) {
@@ -75,8 +90,6 @@ const LoginPage = () => {
       router.push('/')
     } catch (err) {
       handleGetFlowError(router, 'login', setFlow)
-    } finally {
-      setIsLoading(false)
     }
   }
 
@@ -88,20 +101,28 @@ const LoginPage = () => {
       <Title>Login</Title>
       <form className='mt-8' onSubmit={handleSubmit(onSubmit)}>
         <div className='mb-4'>
-          <Input label='Email' icon={<UserIcon />} {...register('identifier', { required: true })} />
+          <Controller
+            control={control}
+            name='email'
+            render={({ field }) => <Input label='Email' errors={errors} icon={<UserIcon />} {...field} />}
+          />
         </div>
         <div className='mb-4'>
-          <Input
-            label='Password'
-            type='password'
-            icon={<LockClosedIcon />}
-            {...register('password', { required: true })}
+          <Controller
+            control={control}
+            name='password'
+            render={({ field }) => (
+              <Input label='Password' type='password' errors={errors} icon={<LockClosedIcon />} {...field} />
+            )}
           />
         </div>
         <div className='mb-8'>
-          <Button block type='primary'>
-            Sign in
-          </Button>
+          <input
+            type='submit'
+            disabled={isSubmitting}
+            className='w-full py-3 px-5 rounded-md inline-flex items-center justify-center border bg-primary border-primary text-base text-center text-white cursor-pointer hover:bg-primary-dark duration-300 transition'
+            value='Sign in'
+          />
         </div>
       </form>
       <p className='text-base mb-6 text-gray-400 text-center'>Or connect with</p>
@@ -132,4 +153,4 @@ const LoginPage = () => {
   )
 }
 
-export default LoginPage
+export default SignInPage

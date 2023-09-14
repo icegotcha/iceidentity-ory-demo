@@ -3,8 +3,11 @@ import { config, createApiHandler } from '@ory/integrations/next-edge'
 // We need to export the config.
 export { config }
 
+const ORY_KRATOS_URL = process.env.ORY_KRATOS_URL
+
 // And create the Ory Cloud API "bridge".
 export default createApiHandler({
+  apiBaseUrlOverride: ORY_KRATOS_URL,
   fallbackToPlayground: true,
   // Because vercel.app is a public suffix and setting cookies for
   // vercel.app is not possible.

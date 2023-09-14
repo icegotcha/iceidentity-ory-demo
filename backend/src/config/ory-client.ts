@@ -1,10 +1,10 @@
 import { Configuration, FrontendApi, OAuth2Api } from "@ory/client";
 
 const apiBaseKratosInternalUrl =
-  process.env.KRATOS_PRIVATE_URL || "http://localhost:4434";
+  process.env.KRATOS_ADMIN_URL || "http://localhost:4434";
 
 const apiBaseHydraUrlInternal =
-  process.env.HYDRA_PRIVATE_URL || "http://localhost:4445";
+  process.env.HYDRA_ADMIN_URL || "http://localhost:4445";
 
 const browserBaseUrl =
   process.env.KRATOS_BROWSER_URL || "http://localhost:3000";
