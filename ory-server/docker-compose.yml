@@ -116,25 +116,6 @@ services:
       - ORY_HYDRA_URL=http://172.29.170.149:4445
     networks:
       - intranet
-  backend:
-    restart: unless-stopped
-    build:
-      context: ../backend
-      dockerfile: Dockerfile
-      target: runner
-    volumes:
-      - ../backend:/app
-    ports:
-      - "3001:3001"
-    command: npm run dev
-    environment:
-      - NODE_ENV=development
-      - PORT=3001
-      - HYDRA_ADMIN_URL=http://172.29.170.149:4445
-      - KRATOS_ADMIN_URL=http://172.29.170.149:4434
-      - KRATOS_BROWSER_URL=http://172.29.170.149:3000
-    networks:
-      - intranet
 
 networks:
   intranet:
