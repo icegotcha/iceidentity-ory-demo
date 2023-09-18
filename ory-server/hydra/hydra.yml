@@ -4,10 +4,10 @@ serve:
 
 urls:
   self:
-    issuer: http://192.168.1.75:4444/
-  consent: http://192.168.1.75:3000/consent
-  login: http://192.168.1.75:3001/oauth/login
-  logout: http://192.168.1.75:3000/logout
+    issuer: http://172.29.170.149:4444/
+  consent: http://172.29.170.149:3000/consent
+  login: http://172.29.170.149:3000/api/oauth/signin
+  logout: http://172.29.170.149:3000/logout
 
 secrets:
   system:

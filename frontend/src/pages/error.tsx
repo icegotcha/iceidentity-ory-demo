@@ -3,7 +3,7 @@ import { AxiosError } from 'axios'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
-import ory from 'utils/sdk'
+import oryKratos from '@/utils/sdk/ory-kratos'
 
 const ErrorPage = () => {
   const [error, setError] = useState<FlowError | string>()
@@ -11,7 +11,6 @@ const ErrorPage = () => {
   // Get ?id=... from the URL
   const router = useRouter()
   const { id } = router.query
-  console.log('🚀 ~ file: error.tsx:14 ~ ErrorPage ~ id:', id)
 
   useEffect(() => {
     // If the router is not ready yet, or we already have an error, do nothing.
@@ -19,14 +18,12 @@ const ErrorPage = () => {
       return
     }
 
-    ory
+    oryKratos
       .getFlowError({ id: String(id) })
       .then(({ data }) => {
-        console.log('🚀 ~ file: error.tsx:25 ~ .then ~ data:', data)
         setError(data)
       })
       .catch((err: AxiosError) => {
-        console.log('🚀 ~ file: error.tsx:29 ~ useEffect ~ err:', err)
         switch (err.response?.status) {
           case 404:
           // The error id could not be found. Let's just redirect home!

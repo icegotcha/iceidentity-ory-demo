@@ -9,10 +9,11 @@ const handleGetFlowError = <S>(
   resetFlow: Dispatch<SetStateAction<S | undefined>>,
 ) => {
   return async (err: Error | AxiosError) => {
+    console.log('🚀 ~ file: errors.ts:12 ~ return ~ err:', err)
     if (axios.isAxiosError(err)) {
       switch (err.response?.data.error?.id) {
         case 'session_inactive':
-          await router.push('/login?return_to=' + window.location.href)
+          await router.push('/signin?return_to=' + window.location.href)
           return
         case 'session_aal2_required':
           if (err.response?.data.redirect_browser_to) {
@@ -23,7 +24,7 @@ const handleGetFlowError = <S>(
             window.location.href = redirectTo.toString()
             return
           }
-          await router.push('/login?aal=aal2&return_to=' + window.location.href)
+          await router.push('/signin?aal=aal2&return_to=' + window.location.href)
           return
         case 'session_already_available':
           await router.push('/')

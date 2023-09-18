@@ -7,19 +7,19 @@ import { LoginFlow } from '@ory/client'
 
 import { UserIcon, LockClosedIcon } from '@heroicons/react/24/outline'
 
-import Layout from 'components/Layout'
-import Title from 'components/Title'
-import Input from 'components/Input'
-import Button from 'components/Button'
+import Layout from '@/components/Layout'
+import Title from '@/components/Title'
+import Input from '@/components/Input'
+import Button from '@/components/Button'
 
-import LoginIllust from 'assets/images/login-illust.svg'
-import GoogleIcon from 'assets/icons/google.svg'
-import FacebookIcon from 'assets/icons/facebook.svg'
-import GithubIcon from 'assets/icons/github.svg'
+import LoginIllust from '@/assets/images/login-illust.svg'
+import GoogleIcon from '@/assets/icons/google.svg'
+import FacebookIcon from '@/assets/icons/facebook.svg'
+import GithubIcon from '@/assets/icons/github.svg'
 
-import ory from 'utils/sdk'
-import handleGetFlowError from 'utils/sdk/errors'
-import { SignInSchema, SignInSchemaType } from 'types/signin'
+import oryKratos from '@/utils/sdk/ory-kratos'
+import handleGetFlowError from '@/utils/sdk/errors'
+import { SignInSchema, SignInSchemaType } from '@/types/signin'
 
 const SignInPage = () => {
   const {
@@ -29,9 +29,11 @@ const SignInPage = () => {
   } = useForm<SignInSchemaType>({ resolver: zodResolver(SignInSchema), mode: 'onChange' })
 
   const [flow, setFlow] = useState<LoginFlow>()
+  console.log('🚀 ~ file: signin.tsx:32 ~ SignInPage ~ flow:', flow)
 
   const router = useRouter()
   const { return_to: returnTo, flow: flowId, refresh, aal } = router.query
+  console.log('🚀 ~ file: signin.tsx:36 ~ SignInPage ~ flowId:', flowId)
 
   useEffect(() => {
     if (!router.isReady || flow) {
@@ -39,16 +41,18 @@ const SignInPage = () => {
     }
 
     if (flowId) {
-      ory
+      console.log('🚀 ~ file: signin.tsx:44 ~ useEffect ~ flowId:', flowId)
+      oryKratos
         .getLoginFlow({ id: String(flowId) })
         .then(({ data }) => {
+          console.log('🚀 ~ file: signin.tsx:48 ~ .then ~ data:', data)
           setFlow(data)
         })
         .catch(handleGetFlowError(router, 'login', setFlow))
       return
     }
 
-    ory
+    oryKratos
       .createBrowserLoginFlow({
         refresh: Boolean(refresh),
         aal: aal ? String(aal) : undefined,
@@ -62,19 +66,8 @@ const SignInPage = () => {
   }, [router, aal, refresh, returnTo, flowId, flow])
 
   const onSubmit = async (values: SignInSchemaType) => {
-    router.replace(
-      {
-        pathname: router.pathname,
-        query: {
-          ...router.query,
-          flow: flow?.id,
-        },
-      },
-      undefined,
-      { shallow: true },
-    )
     try {
-      await ory.updateLoginFlow({
+      await oryKratos.updateLoginFlow({
         flow: String(flow?.id),
         updateLoginFlowBody: {
           method: 'password',
@@ -154,3 +147,10 @@ const SignInPage = () => {
 }
 
 export default SignInPage
+
+export const getServerSideProps = async () => {
+  // Get flow kratos
+  return {
+    props: {},
+  }
+}
