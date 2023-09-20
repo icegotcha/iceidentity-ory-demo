@@ -3,8 +3,10 @@ version: v0.13.0
 dsn: postgres://admin:secret@database:5432/identity?sslmode=disable&max_conns=20&max_idle_conns=4
 
 serve:
+  admin:
+    base_url: http://127.0.0.1:4434
   public:
-    base_url: http://172.29.170.149:4433/
+    base_url: http://127.0.0.1:4433
     cors:
       enabled: true
       allowed_origins:
@@ -23,8 +25,6 @@ serve:
       exposed_headers:
         - Content-Type
         - Set-Cookie
-  admin:
-    base_url: http://172.29.170.149:4434/
 
 selfservice:
   default_browser_return_url: http://172.29.170.149:3000

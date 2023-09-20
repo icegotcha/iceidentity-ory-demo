@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import Image from 'next/image'
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { LoginFlow } from '@ory/client'
+import { LoginFlow, UiNodeInputAttributes } from '@ory/client'
 
 import { UserIcon, LockClosedIcon } from '@heroicons/react/24/outline'
 
@@ -63,12 +63,14 @@ const SignInPage = () => {
 
   const onSubmit = async (values: SignInSchemaType) => {
     try {
+      const csrf_token = (flow?.ui.nodes[0].attributes as UiNodeInputAttributes).value as string
       await oryKratos.updateLoginFlow({
         flow: String(flow?.id),
         updateLoginFlowBody: {
           method: 'password',
           identifier: values.email,
           password: values.password,
+          csrf_token,
         },
       })
 
@@ -88,7 +90,7 @@ const SignInPage = () => {
         <Image src={LoginIllust} width={300} alt='Login Illustration' className='m-auto' />
       </div>
       <Title>Login</Title>
-      <form className='mt-8' onSubmit={handleSubmit(onSubmit)}>
+      <form className='mt-8' action={flow?.ui.action} method={flow?.ui.method} onSubmit={handleSubmit(onSubmit)}>
         <div className='mb-4'>
           <Controller
             control={control}
