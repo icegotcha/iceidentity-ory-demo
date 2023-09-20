@@ -29,11 +29,9 @@ const SignInPage = () => {
   } = useForm<SignInSchemaType>({ resolver: zodResolver(SignInSchema), mode: 'onChange' })
 
   const [flow, setFlow] = useState<LoginFlow>()
-  console.log('🚀 ~ file: signin.tsx:32 ~ SignInPage ~ flow:', flow)
 
   const router = useRouter()
   const { return_to: returnTo, flow: flowId, refresh, aal } = router.query
-  console.log('🚀 ~ file: signin.tsx:36 ~ SignInPage ~ flowId:', flowId)
 
   useEffect(() => {
     if (!router.isReady || flow) {
@@ -41,11 +39,9 @@ const SignInPage = () => {
     }
 
     if (flowId) {
-      console.log('🚀 ~ file: signin.tsx:44 ~ useEffect ~ flowId:', flowId)
       oryKratos
         .getLoginFlow({ id: String(flowId) })
         .then(({ data }) => {
-          console.log('🚀 ~ file: signin.tsx:48 ~ .then ~ data:', data)
           setFlow(data)
         })
         .catch(handleGetFlowError(router, 'login', setFlow))
@@ -147,10 +143,3 @@ const SignInPage = () => {
 }
 
 export default SignInPage
-
-export const getServerSideProps = async () => {
-  // Get flow kratos
-  return {
-    props: {},
-  }
-}

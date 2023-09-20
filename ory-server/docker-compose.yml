@@ -111,8 +111,8 @@ services:
     command: npm run dev
     environment:
       - NODE_ENV=development
-      - ORY_KRATOS_URL=http://172.29.170.149:4434
       - ORY_KRATOS_BROWSER_URL=http://172.29.170.149:3000
+      - ORY_KRATOS_URL=http://172.29.170.149:4433
       - ORY_HYDRA_URL=http://172.29.170.149:4445
     networks:
       - intranet

@@ -9,7 +9,6 @@ const handleGetFlowError = <S>(
   resetFlow: Dispatch<SetStateAction<S | undefined>>,
 ) => {
   return async (err: Error | AxiosError) => {
-    console.log('🚀 ~ file: errors.ts:12 ~ return ~ err:', err)
     if (axios.isAxiosError(err)) {
       switch (err.response?.data.error?.id) {
         case 'session_inactive':

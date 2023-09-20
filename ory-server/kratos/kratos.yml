@@ -7,6 +7,22 @@ serve:
     base_url: http://172.29.170.149:4433/
     cors:
       enabled: true
+      allowed_origins:
+        - http://172.29.170.149:3000
+      allowed_methods:
+        - POST
+        - GET
+        - PUT
+        - PATCH
+        - DELETE
+      allowed_headers:
+        - Authorization
+        - Access-Control-Allow-Origin
+        - Cookie
+        - Content-Type
+      exposed_headers:
+        - Content-Type
+        - Set-Cookie
   admin:
     base_url: http://172.29.170.149:4434/
 
