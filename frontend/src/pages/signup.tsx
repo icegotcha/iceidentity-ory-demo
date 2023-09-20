@@ -1,10 +1,13 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+// @ts-nocheck
+// TODO: Remove ts-nocheck when all components are properly insert props
 import Image from 'next/image'
 import { IdentificationIcon, LockClosedIcon, PhoneIcon, UserIcon } from '@heroicons/react/24/outline'
 
-import Button from 'components/Button'
-import Input from 'components/Input'
-import Layout from 'components/Layout'
-import Title from 'components/Title'
+import Button from '@/components/Button'
+import Input from '@/components/Input'
+import Layout from '@/components/Layout'
+import Title from '@/components/Title'
 
 import SignupIllust from 'assets/images/signup-illust.svg'
 import GoogleIcon from 'assets/icons/google.svg'

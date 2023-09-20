@@ -3,7 +3,7 @@ version: "3.7"
 services:
   database:
     image: postgres:13
-    restart: always
+    restart: unless-stopped
     environment:
       POSTGRES_PASSWORD: secret
     ports:
@@ -99,6 +99,7 @@ services:
     networks:
       - intranet
   frontend:
+    restart: unless-stopped
     build:
       context: ../frontend
       dockerfile: Dockerfile
@@ -110,20 +111,9 @@ services:
     command: npm run dev
     environment:
       - NODE_ENV=development
-    networks:
-      - intranet
-  backend:
-    build:
-      context: ../backend
-      dockerfile: Dockerfile
-      target: runner
-    volumes:
-      - ../backend:/app
-    ports:
-      - "3001:3001"
-    command: npm run dev
-    environment:
-      - NODE_ENV=development
+      - ORY_KRATOS_BROWSER_URL=http://172.29.170.149:3000
+      - ORY_KRATOS_URL=http://172.29.170.149:4433
+      - ORY_HYDRA_URL=http://172.29.170.149:4445
     networks:
       - intranet
 
