@@ -1,10 +1,11 @@
 import { FieldErrors } from 'react-hook-form'
 import { ErrorMessage } from '@hookform/error-message'
 import { SignInFieldName, SignInSchemaType } from '@/types/signin'
+import { SignUpFieldName, SignUpSchemaType } from '@/types/signup'
 
 export interface InputErrorProps {
-  name: SignInFieldName
-  errors: FieldErrors<SignInSchemaType>
+  name: SignInFieldName | SignUpFieldName
+  errors: FieldErrors<SignInSchemaType | SignUpSchemaType>
 }
 
 const InputErrorMessage = ({ errors, name }: InputErrorProps) => {
