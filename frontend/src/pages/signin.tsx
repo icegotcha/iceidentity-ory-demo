@@ -5,8 +5,6 @@ import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { LoginFlow, UiNodeInputAttributes } from '@ory/client'
 
-import { UserIcon, LockClosedIcon } from '@heroicons/react/24/outline'
-
 import Layout from '@/components/Layout'
 import Title from '@/components/Title'
 import Input from '@/components/Input'
@@ -20,6 +18,9 @@ import GithubIcon from '@/assets/icons/github.svg'
 import oryKratos from '@/utils/sdk/ory-kratos'
 import handleGetFlowError from '@/utils/sdk/errors'
 import { SignInSchema, SignInSchemaType } from '@/types/signin'
+import UserIcon from '@heroicons/react/24/outline/UserIcon'
+import LockClosedIcon from '@heroicons/react/24/outline/LockClosedIcon'
+import Alert from '@/components/Alert'
 
 const SignInPage = () => {
   const {
@@ -90,6 +91,16 @@ const SignInPage = () => {
         <Image src={LoginIllust} width={300} alt='Login Illustration' className='m-auto' />
       </div>
       <Title>Login</Title>
+
+      {flow?.ui.messages && flow.ui.messages?.length < 0 && (
+        <Alert type='error'>
+          <ul>
+            {flow.ui.messages.map((message) => (
+              <li key={message.id}>{message.text}</li>
+            ))}
+          </ul>
+        </Alert>
+      )}
       <form className='mt-8' action={flow?.ui.action} method={flow?.ui.method} onSubmit={handleSubmit(onSubmit)}>
         <div className='mb-4'>
           <Controller
