@@ -4,9 +4,9 @@ dsn: postgres://admin:secret@database:5432/identity?sslmode=disable&max_conns=20
 
 serve:
   admin:
-    base_url: http://127.0.0.1:4434
+    base_url: http://172.29.170.149:4434
   public:
-    base_url: http://127.0.0.1:4433
+    base_url: http://172.29.170.149:4433
     cors:
       enabled: true
       allowed_origins:
@@ -60,7 +60,7 @@ selfservice:
       use: code
 
     verification:
-      enabled: true
+      enabled: false # bypass verification for testing registration
       ui_url: http://172.29.170.149:3000/verification
       use: code
       after:
