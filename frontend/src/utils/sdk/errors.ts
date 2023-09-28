@@ -34,21 +34,21 @@ const handleGetFlowError = <S>(
         case 'self_service_flow_return_to_forbidden':
           toast.error('The return_to address is not allowed.')
           resetFlow(undefined)
-          await router.push('/' + flowType)
+          await router.push('/' + flowType === 'login' ? 'signin' : flowType === 'registration' ? 'signup' : flowType)
           return
         case 'self_service_flow_expired':
           toast.error('Your interaction expired, please fill out the form again.')
           resetFlow(undefined)
-          await router.push('/' + flowType)
+          await router.push('/' + flowType === 'login' ? 'signin' : flowType === 'registration' ? 'signup' : flowType)
           return
         case 'security_csrf_violation':
           toast.error('A security violation was detected, please fill out the form again.')
           resetFlow(undefined)
-          await router.push('/' + flowType)
+          await router.push('/' + flowType === 'login' ? 'signin' : flowType === 'registration' ? 'signup' : flowType)
           return
         case 'security_identity_mismatch':
           resetFlow(undefined)
-          await router.push('/' + flowType)
+          await router.push('/' + flowType === 'login' ? 'signin' : flowType === 'registration' ? 'signup' : flowType)
           return
         case 'browser_location_change_required':
           window.location.href = err.response.data.redirect_browser_to
@@ -58,7 +58,7 @@ const handleGetFlowError = <S>(
       switch (err.response?.status) {
         case 410:
           resetFlow(undefined)
-          await router.push('/' + flowType)
+          await router.push('/' + flowType === 'login' ? 'signin' : flowType === 'registration' ? 'signup' : flowType)
           return
       }
     }

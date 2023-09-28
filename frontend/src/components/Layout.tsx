@@ -7,12 +7,12 @@ interface LayoutProps {
 
 const Layout = ({ children, title }: LayoutProps) => {
   return (
-    <main className='w-full h-screen py-0 sm:py-8 bg-primary-light flex items-center justify-center'>
+    <main className='w-full min-h-screen py-0 sm:py-8 bg-primary-light flex items-center justify-center'>
       <Head>
         <title>{title ? `IceIdentity | ${title}` : 'IceIdentity'}</title>
       </Head>
 
-      <div className='shadow-xl w-full sm:w-auto rounded-none sm:rounded-lg p-8 bg-white border  border-gray-100'>
+      <div className='shadow-xl w-full md:w-96 rounded-none sm:rounded-lg p-8 bg-white border  border-gray-100'>
         {children}
       </div>
     </main>

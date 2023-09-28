@@ -19,6 +19,7 @@ specifiers:
   eslint-import-resolver-typescript: ^3.5.5
   eslint-plugin-import: ^2.27.5
   eslint-plugin-prettier: ^5.0.0
+  libphonenumber-js: ^1.10.44
   next: 13.4.12
   postcss: ^8.4.27
   prettier: ^3.0.0
@@ -38,6 +39,7 @@ dependencies:
   '@ory/client': 1.1.41
   '@ory/integrations': 1.1.4_eevrtclbt775olb2pt24mvbgpu
   axios: 1.4.0
+  libphonenumber-js: 1.10.44
   next: 13.4.12_biqbaboplfbrettd7655fr4n2y
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
@@ -2361,6 +2363,10 @@ packages:
       prelude-ls: 1.2.1
       type-check: 0.4.0
     dev: true
+
+  /libphonenumber-js/1.10.44:
+    resolution: {integrity: sha512-svlRdNBI5WgBjRC20GrCfbFiclbF0Cx+sCcQob/C1r57nsoq0xg8r65QbTyVyweQIlB33P+Uahyho6EMYgcOyQ==}
+    dev: false
 
   /lilconfig/2.1.0:
     resolution: {integrity: sha512-utWOt/GHzuUxnLKxB6dk81RoOeoNeHgbrXiuGk4yyF5qlRz+iIVWu56E2fqGHFrXz0QNUhLB/8nKqvRH66JKGQ==}
