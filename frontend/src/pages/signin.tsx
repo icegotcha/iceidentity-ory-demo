@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import Image from 'next/image'
+import axios from 'axios'
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { LoginFlow, UiNodeInputAttributes } from '@ory/client'
@@ -81,6 +82,12 @@ const SignInPage = () => {
       }
       router.push('/')
     } catch (err) {
+      // If the previous handler did not catch the error it's most likely a form validation error
+      if (axios.isAxiosError(err) && err.response?.status === 400) {
+        // Yup, it is!
+        setFlow(err.response?.data as LoginFlow)
+        return
+      }
       handleGetFlowError(router, 'login', setFlow)
     }
   }
@@ -91,10 +98,9 @@ const SignInPage = () => {
         <Image src={LoginIllust} width={300} alt='Login Illustration' className='m-auto' />
       </div>
       <Title>Login</Title>
-
-      {flow?.ui.messages && flow.ui.messages?.length < 0 && (
+      {flow?.ui.messages && flow.ui.messages?.length > 0 && (
         <Alert type='error'>
-          <ul>
+          <ul className='list-none'>
             {flow.ui.messages.map((message) => (
               <li key={message.id}>{message.text}</li>
             ))}

@@ -50,7 +50,7 @@ const Alert = ({ children, type }: AlertProps) => {
     <div
       className={`flex items-center justify-center py-3 px-5 rounded-md border ${bgColor} ${textColor} ${borderColor} text-base text-center`}
     >
-      <span className={`w-6 h-6 mr-2 ${textColor}`}>{icon}</span>
+      <span className={`w-20 h-20 flex items-center mr-2 ${textColor}`}>{icon}</span>
       {children}
     </div>
   )
