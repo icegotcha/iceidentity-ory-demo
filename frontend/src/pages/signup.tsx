@@ -20,6 +20,7 @@ import oryKratos from '@/utils/sdk/ory-kratos'
 import handleFlowError from '@/utils/sdk/errors'
 import { SignUpSchema, SignUpSchemaType } from '@/types/signup'
 import Alert from '@/components/Alert'
+import { AxiosError } from 'axios'
 
 const SignUpPage = () => {
   const router = useRouter()
@@ -76,7 +77,6 @@ const SignUpPage = () => {
       flow?.ui.nodes.find((n) => (n.attributes as UiNodeInputAttributes).name === 'csrf_token')
         ?.attributes as UiNodeInputAttributes
     )?.value as string
-    console.log('🚀 ~ file: signup.tsx:79 ~ onSubmit ~ csrf_token:', csrf_token)
     const indexLastSpace = values.fullname.lastIndexOf(' ')
     const firstName = values.fullname.substring(0, indexLastSpace)
     const lastName = values.fullname.substring(indexLastSpace + 1)
@@ -119,6 +119,16 @@ const SignUpPage = () => {
         await router.push(flow?.return_to || '/')
       })
       .catch(handleFlowError(router, 'registration', setFlow))
+      .catch((err: AxiosError) => {
+        // If the previous handler did not catch the error it's most likely a form validation error
+        if (err.response?.status === 400) {
+          // Yup, it is!
+          setFlow(err.response?.data as RegistrationFlow)
+          return
+        }
+
+        return Promise.reject(err)
+      })
   }
 
   return (
@@ -127,9 +137,9 @@ const SignUpPage = () => {
         <Image src={SignupIllust} width={300} alt='Signup Illustration' className='m-auto' />
       </div>
       <Title>Sign up</Title>
-      {flow?.ui.messages && flow.ui.messages?.length < 0 && (
+      {flow?.ui.messages && flow.ui.messages?.length > 0 && (
         <Alert type='error'>
-          <ul>
+          <ul className='list-none'>
             {flow.ui.messages.map((message) => (
               <li key={message.id}>{message.text}</li>
             ))}

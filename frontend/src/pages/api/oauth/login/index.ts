@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { isQuerySet, getRequestUrl } from '@/utils/sdk'
 import logger from '@/utils/logger'
 import oryHydra from '@/utils/sdk/ory-hydra'
-import oryKratos, { ORY_KRATOS_BROWSER_URL, ORY_KRATOS_INTERNAL_API_URL } from '@/utils/sdk/ory-kratos'
+import { ORY_KRATOS_BROWSER_URL, ORY_KRATOS_INTERNAL_API_URL, oryKratosInternalApi } from '@/utils/sdk/ory-kratos'
 import { ResponseError } from '@/types/error'
 
 const redirectToLogin = (req: NextApiRequest, res: NextApiResponse) => {
@@ -63,8 +63,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     //  Get the session
-    const { data: session } = await oryKratos.toSession({
-      cookie: req.headers.cookie as string,
+    const { data: session } = await oryKratosInternalApi.toSession({
+      cookie: req.headers.cookie,
     })
 
     const subject = session.identity.id
