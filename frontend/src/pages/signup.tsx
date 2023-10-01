@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
+import axios from 'axios'
 import { useRouter } from 'next/router'
 import { ContinueWithVerificationUi, RegistrationFlow, UiNodeInputAttributes } from '@ory/client'
 import { IdentificationIcon, LockClosedIcon, PhoneIcon, UserIcon } from '@heroicons/react/24/outline'
@@ -10,6 +11,7 @@ import Button from '@/components/Button'
 import Input from '@/components/Input'
 import Layout from '@/components/Layout'
 import Title from '@/components/Title'
+import Alert from '@/components/Alert'
 
 import SignupIllust from '@/assets/images/signup-illust.svg'
 import GoogleIcon from '@/assets/icons/google.svg'
@@ -19,8 +21,6 @@ import GithubIcon from '@/assets/icons/github.svg'
 import oryKratos from '@/utils/sdk/ory-kratos'
 import handleFlowError from '@/utils/sdk/errors'
 import { SignUpSchema, SignUpSchemaType } from '@/types/signup'
-import Alert from '@/components/Alert'
-import { AxiosError } from 'axios'
 
 const SignUpPage = () => {
   const router = useRouter()
@@ -78,10 +78,10 @@ const SignUpPage = () => {
         ?.attributes as UiNodeInputAttributes
     )?.value as string
     const indexLastSpace = values.fullname.lastIndexOf(' ')
-    const firstName = values.fullname.substring(0, indexLastSpace)
-    const lastName = values.fullname.substring(indexLastSpace + 1)
-    oryKratos
-      .updateRegistrationFlow({
+    const firstName = indexLastSpace > -1 ? values.fullname.substring(0, indexLastSpace) : values.fullname
+    const lastName = indexLastSpace > -1 ? values.fullname.substring(indexLastSpace + 1) : ''
+    try {
+      const { data: flowData } = await oryKratos.updateRegistrationFlow({
         flow: String(flow?.id),
         updateRegistrationFlowBody: {
           method: 'password',
@@ -97,38 +97,31 @@ const SignUpPage = () => {
           csrf_token,
         },
       })
-      .then(async ({ data }) => {
-        // If we ended up here, it means we are successfully signed up!
-        //
-        // You can do cool stuff here, like having access to the identity which just signed up:
-        console.log('This is the user session: ', data, data.identity)
+      // If we ended up here, it means we are successfully signed up!
 
-        // continue_with is a list of actions that the user might need to take before the registration is complete.
-        // It could, for example, contain a link to the verification form.
-        if (data.continue_with) {
-          for (const item of data.continue_with) {
-            switch (item.action) {
-              case 'show_verification_ui':
-                await router.push('/verification?flow=' + (item as ContinueWithVerificationUi).flow.id)
-                return
-            }
+      // continue_with is a list of actions that the user might need to take before the registration is complete.
+      // It could, for example, contain a link to the verification form.
+      if (flowData.continue_with) {
+        for (const item of flowData.continue_with) {
+          switch (item.action) {
+            case 'show_verification_ui':
+              router.push('/verification?flow=' + (item as ContinueWithVerificationUi).flow.id)
+              return
           }
         }
+      }
 
-        // If continue_with did not contain anything, we can just return to the home page.
-        await router.push(flow?.return_to || '/')
-      })
-      .catch(handleFlowError(router, 'registration', setFlow))
-      .catch((err: AxiosError) => {
-        // If the previous handler did not catch the error it's most likely a form validation error
-        if (err.response?.status === 400) {
-          // Yup, it is!
-          setFlow(err.response?.data as RegistrationFlow)
-          return
-        }
-
-        return Promise.reject(err)
-      })
+      // If continue_with did not contain anything, we can just return to the home page.
+      router.push(flow?.return_to || '/')
+    } catch (err) {
+      // If the previous handler did not catch the error it's most likely a form validation error
+      if (axios.isAxiosError(err) && err.response?.status === 400) {
+        // Yup, it is!
+        setFlow(err.response?.data as RegistrationFlow)
+        return
+      }
+      return handleFlowError(router, 'registration', setFlow)
+    }
   }
 
   return (
