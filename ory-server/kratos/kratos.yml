@@ -4,13 +4,13 @@ dsn: postgres://admin:secret@database:5432/identity?sslmode=disable&max_conns=20
 
 serve:
   admin:
-    base_url: http://172.29.170.149:4434
+    base_url: http://kratos:4434
   public:
-    base_url: http://172.29.170.149:4433
+    base_url: http://127.0.0.1:4433
     cors:
       enabled: true
       allowed_origins:
-        - http://172.29.170.149:3000
+        - http://127.0.0.1:3000
       allowed_methods:
         - POST
         - GET
@@ -27,9 +27,9 @@ serve:
         - Set-Cookie
 
 selfservice:
-  default_browser_return_url: http://172.29.170.149:3000
+  default_browser_return_url: http://127.0.0.1:3000
   allowed_return_urls:
-    - http://172.29.170.149:3000
+    - http://127.0.0.1:3000
 
   methods:
     password:
@@ -47,36 +47,36 @@ selfservice:
 
   flows:
     error:
-      ui_url: http://172.29.170.149:3000/error
+      ui_url: http://127.0.0.1:3000/error
 
     settings:
-      ui_url: http://172.29.170.149:3000/settings
+      ui_url: http://127.0.0.1:3000/settings
       privileged_session_max_age: 15m
       required_aal: highest_available
 
     recovery:
       enabled: true
-      ui_url: http://172.29.170.149:3000/recovery
+      ui_url: http://127.0.0.1:3000/recovery
       use: code
 
     verification:
       enabled: false # bypass verification for testing registration
-      ui_url: http://172.29.170.149:3000/verification
+      ui_url: http://127.0.0.1:3000/verification
       use: code
       after:
-        default_browser_return_url: http://172.29.170.149:3000
+        default_browser_return_url: http://127.0.0.1:3000
 
     logout:
       after:
-        default_browser_return_url: http://172.29.170.149:3000/signin
+        default_browser_return_url: http://127.0.0.1:3000/signin
 
     login:
-      ui_url: http://172.29.170.149:3000/signin
+      ui_url: http://127.0.0.1:3000/signin
       lifespan: 10m
 
     registration:
       lifespan: 10m
-      ui_url: http://172.29.170.149:3000/signup
+      ui_url: http://127.0.0.1:3000/signup
       after:
         password:
           hooks:
