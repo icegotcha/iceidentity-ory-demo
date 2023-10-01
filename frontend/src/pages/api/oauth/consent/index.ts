@@ -1,4 +1,5 @@
 import { ResponseError } from '@/types/error'
+import logger from '@/utils/logger'
 import oryHydra from '@/utils/sdk/ory-hydra'
 import { oryKratosInternalApi } from '@/utils/sdk/ory-kratos'
 import { AcceptOAuth2ConsentRequestSession } from '@ory/client'
@@ -35,6 +36,12 @@ const postConsent = async (req: NextApiRequest, res: NextApiResponse) => {
     cookie: req.headers.cookie as string,
   })
 
+  const { identity } = kratosSession
+  if (!identity) {
+    logger.error('No identity found in session')
+    throw new ResponseError('Unauthorized', 401)
+  }
+
   // The session allows us to set session data for id and access tokens
   const session: AcceptOAuth2ConsentRequestSession = {
     // This data will be available when introspecting the token. Try to avoid sensitive information here,
@@ -47,21 +54,23 @@ const postConsent = async (req: NextApiRequest, res: NextApiResponse) => {
     id_token: {
       ...(grantScope.indexOf('email') !== -1
         ? {
-            email: kratosSession.identity.traits.email,
+            email: identity.traits.email,
             email_verified: true,
           }
         : {}),
       ...(grantScope.indexOf('phone') !== -1
         ? {
-            phone_number: kratosSession.identity.traits.mobile,
+            phone_number: identity.traits.mobile,
             phone_number_verified: true,
           }
         : {}),
       ...(grantScope.indexOf('profile') !== -1
         ? {
-            name: kratosSession.identity.traits.name,
-            given_name: kratosSession.identity.traits.name.split(' ')[0],
-            family_name: kratosSession.identity.traits.name.split(' ')[1],
+            name: `${identity.traits.name.first}${
+              identity.traits.name.last?.length > 0 ? ' ' + identity.traits.name.last : ''
+            }`,
+            given_name: identity.traits.name.first,
+            family_name: identity.traits.name.last,
           }
         : {}),
     },
@@ -104,12 +113,12 @@ const postConsent = async (req: NextApiRequest, res: NextApiResponse) => {
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     if (req.method === 'POST') {
-      return postConsent(req, res)
+      postConsent(req, res)
     }
   } catch (error) {
     if (error instanceof ResponseError) {
-      return res.status(error.status || 500).json({ message: error.message })
+      res.status(error.status || 500).json({ message: error.message })
     }
-    return res.status(500).json({ message: error })
+    res.status(500).json({ message: error })
   }
 }

@@ -98,24 +98,6 @@ services:
       - hydra-migrate
     networks:
       - intranet
-  frontend:
-    restart: unless-stopped
-    build:
-      context: ../frontend
-      dockerfile: Dockerfile
-      target: runner
-    volumes:
-      - ../frontend:/app
-    ports:
-      - "3000:3000"
-    command: npm run dev
-    environment:
-      - NODE_ENV=development
-      - ORY_KRATOS_BROWSER_URL=http://172.29.170.149:3000
-      - ORY_KRATOS_URL=http://172.29.170.149:4433
-      - ORY_HYDRA_URL=http://172.29.170.149:4445
-    networks:
-      - intranet
 
 networks:
   intranet:
